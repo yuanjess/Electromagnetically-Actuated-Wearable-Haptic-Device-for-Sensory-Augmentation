@@ -1,0 +1,215 @@
+/* Author: Helen Situ. Creator's notes: the code is written with the logic that if its not soft or medium touch, it is a hard touch.
+*/
+//initial conditions: assigning pins
+int actuator0 = 5;
+int sensor0 = 4;
+int actuator1 = 6;
+int sensor1 = 3;
+int actuator2 = 7;
+int sensor2 = 2;
+int actuator3 = 9;
+int sensor3 = 1;
+int actuator4 = 10;
+int sensor4 = 0;
+ 
+/*__KEEP THE FOLLOWING AS A COMMENT BLOCK FOR REFERENCING__
+initial conditions: sensor characterization
+x [-] and y [g], from analogRead() output VS Weight chart
+eqns correspond to the number on the physical sensors
+sensor 0: y = (-234.4 * log(x)) + 1608.3  where log(x) is ln(x)
+sensor 1: y = (-237.8 * log(x)) + 1647
+sensor 2: y = (-141.3 * log(x)) + 977.87
+sensor 3: y = (-205.4 * log(x)) + 1405.6
+sensor 4: y = (-205.3 * log(x)) + 1425.4
+_________________________________________________________*/
+//initial conditions: force range limits (soft (S), medium (M), hard touch (H)
+float lowerS = 0.5; //[N] justification: lower avg tap force
+float upperS = 1.0; //[N] upper avg tap force
+float lowerM = upperS; //[N]
+float upperM = 2.0; //[N]
+float lowerH = upperM; //[N]
+float upperH = 5; //[N] arbitrary value, not necessary
+//initial conditions: weight-to-force conversion ratio
+float r = 0.0098/1; //[N/g]
+//initial conditions: frequency specs (soft (S), medium (M), hard touch (H))
+int tapDuration = 100; //[ms]
+int tS = 2000; //[ms] for a soft touch, one tap per tS milliseconds
+int tM = 1000; //[ms]
+int tH = 500; //[ms]
+//_______________________________________
+// the setup routine runs once when you press reset:
+void setup() {
+// initialize serial communication at 9600 bits per second:
+Serial.begin(9600);
+pinMode(sensor0, INPUT);
+pinMode(actuator0, OUTPUT);
+pinMode(sensor1, INPUT);
+pinMode(actuator1, OUTPUT);
+pinMode(sensor2, INPUT);
+pinMode(actuator2, OUTPUT);
+pinMode(sensor3, INPUT);
+pinMode(actuator3, OUTPUT);
+pinMode(sensor4, INPUT);
+pinMode(actuator4, OUTPUT);
+}
+void loop() {
+  // Read the input on sensors. Analog reading yields values from 0 to 1023.
+  float x0 = analogRead(sensor0);
+  //Using the characteristic eqns, find weight corresponding to the analogRead() output
+  float y0 = (-234.4 * log(x0)) + 1608.3;//[g]
+  //Convert the weight [g] to force [N]
+  float force0 = y0 * r; //[N]
+ 
+  // Read the input on sensor 1. Analog reading yields values from 0 to 1023.
+  float x1 = analogRead(sensor1);
+  //Using the characteristic eqns, find weight corresponding to the analogRead() output
+  float y1 = (-237.8 * log(x1)) + 1647; //[g]
+  //Convert the weight [g] to force [N]
+  float force1 = y1 * r; //[N]
+ 
+  // Read the input on sensor 2. Analog reading yields values from 0 to 1023.
+  float x2 = analogRead(sensor2);
+  //Using the characteristic eqns, find weight corresponding to the analogRead() output
+  float y2 = (-141.3 * log(x2)) + 977.87; //[g]
+  //Convert the weight [g] to force [N]
+  float force2 = y2 * r; //[N]
+ 
+  // Read the input on sensor 3. Analog reading yields values from 0 to 1023.
+  float x3 = analogRead(sensor3);
+  //Using the characteristic eqns, find weight corresponding to the analogRead() output
+  float y3 = (-205.4 * log(x3)) + 1405.6; //[g]
+  //Convert the weight [g] to force [N]
+  float force3 = y3 * r; //[N]
+ 
+  // Read the input on sensor 4. Analog reading yields values from 0 to 1023.
+  float x4 = analogRead(sensor3);
+  //Using the characteristic eqns, find weight corresponding to the analogRead() output
+  float y4 = (-205.3 * log(x4)) + 1425.4; //[g]
+  //Convert the weight [g] to force [N]
+  float force4 = y4 * r; //[N]
+ 
+  if (force0 < lowerS) {
+    digitalWrite(actuator0, LOW);
+  }
+  else if ((force0 >= lowerS) && (force0 < upperS)) {
+    //if force on sensor is inside S touch range, low freq tap occurs
+    digitalWrite(actuator0, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator0, LOW); //Actuator turns off
+    delay(tS);//delay running the rest of the code
+  }
+  else if ((force0 >= lowerM) && (force0 < upperM)) {
+    //if force on sensor is inside M touch range, medium freq tap occurs
+    digitalWrite(actuator0, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator0, LOW); //Actuator turns off
+    delay(tM);//delay running the rest of the code
+  }
+  else {
+    //if force on sensor is inside H touch range, high freq tap occurs
+    digitalWrite(actuator0, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator0, LOW); //Actuator turns off
+    delay(tH);//delay running the rest of the code
+  }
+ 
+  if (force1 < lowerS) {
+   digitalWrite(actuator1, LOW);
+  }
+  else if ((force1 >= lowerS) && (force1 < upperS)) {
+    //if force on sensor is inside S touch range, low freq tap occurs
+    digitalWrite(actuator1, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator1, LOW); //Actuator turns off
+    delay(tS);//delay running the rest of the code
+  }
+  else if ((force1 >= lowerM) && (force1 < upperM)) {
+    //if force on sensor is inside M touch range, medium freq tap occurs
+    digitalWrite(actuator1, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator1, LOW); //Actuator turns off
+    delay(tM);//delay running the rest of the code
+  }
+  else {
+    //if force on sensor is inside H touch range, high freq tap occurs
+    digitalWrite(actuator1, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator1, LOW); //Actuator turns off
+    delay(tH);//delay running the rest of the code
+  }
+ 
+  if (force2 < lowerS) {
+   digitalWrite(actuator2, LOW);
+  }
+  else if ((force2 >= lowerS) && (force2 < upperS)) {
+    //if force on sensor is inside S touch range, low freq tap occurs
+    digitalWrite(actuator2, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator2, LOW); //Actuator turns off
+    delay(tS);//delay running the rest of the code
+  }
+  else if ((force2 >= lowerM) && (force2 < upperM)) {
+    //if force on sensor is inside M touch range, medium freq tap occurs
+    digitalWrite(actuator2, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator2, LOW); //Actuator turns off
+    delay(tM);//delay running the rest of the code
+  }
+  else {
+    //if force on sensor is inside H touch range, high freq tap occurs
+    digitalWrite(actuator2, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator2, LOW); //Actuator turns off
+    delay(tH);//delay running the rest of the code
+  }
+ 
+  if (force3 < lowerS) {
+   digitalWrite(actuator3, LOW);
+  }
+  else if ((force3 >= lowerS) && (force3 < upperS)) {
+    //if force on sensor is inside S touch range, low freq tap occurs
+    digitalWrite(actuator3, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator3, LOW); //Actuator turns off
+    delay(tS);//delay running the rest of the code
+  }
+  else if ((force3 >= lowerM) && (force3 < upperM)) {
+    //if force on sensor is inside M touch range, medium freq tap occurs
+    digitalWrite(actuator3, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator3, LOW); //Actuator turns off
+    delay(tM);//delay running the rest of the code
+  }
+  else {
+    //if force on sensor is inside H touch range, high freq tap occurs
+    digitalWrite(actuator3, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator3, LOW); //Actuator turns off
+    delay(tH);//delay running the rest of the code
+  }
+ 
+  if (force4 < lowerS) {
+   digitalWrite(actuator4, LOW);
+  }
+  else if ((force4 >= lowerS) && (force4 < upperS)) {
+    //if force on sensor is inside S touch range, low freq tap occurs
+    digitalWrite(actuator4, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator4, LOW); //Actuator turns off
+    delay(tS);//delay running the rest of the code
+  }
+  else if ((force4 >= lowerM) && (force4 < upperM)) {
+    //if force on sensor is inside M touch range, medium freq tap occurs
+    digitalWrite(actuator4, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator4, LOW); //Actuator turns off
+    delay(tM);//delay running the rest of the code
+  }
+  else {
+    //if force on sensor is inside H touch range, high freq tap occurs
+    digitalWrite(actuator4, HIGH); //Actuator turns on
+    delay(tapDuration); //delay running the rest of the code
+    digitalWrite(actuator4, LOW); //Actuator turns off
+    delay(tH);//delay running the rest of the code
+  }
+}
